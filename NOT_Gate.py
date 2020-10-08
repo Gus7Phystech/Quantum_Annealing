@@ -37,13 +37,14 @@ def not_gate(input_x, sampled_not):
             print("I can't apply NOT gate to the x")
             break
         i += 1
-    
+
     # return second variable
     return sliced_set.first.sample['x2']
 
 
 if __name__ == '__main__':
     sampled_model = sample_BQM(NOT_BQM) #sampling model
+    print(sampled_model)
     #input
     in_x = int(input("Please, input an x to apply NOT gate: "))
     #answer
