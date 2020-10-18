@@ -3,8 +3,8 @@ from dimod.reference.samplers import ExactSolver
 
 #
 #constant BQM model:
-AND_BQM = dimod.BinaryQuadraticModel({'x1': 0.0, 'x2': 0.0, 'y1': 6.0},
-                  {('x2', 'x1'): 2.0, ('y1', 'x1'): -4.0, ('y1', 'x2'): -4.0},
+CNOT_BQM = dimod.BinaryQuadraticModel({'x1': 1.0, 'x2': 1.0, 'x3': 1.0, 'y': -2.0},
+                  {('x1', 'x2'): -1.0, ('x1', 'x3'): -1.0, ('x2', 'x3'): -1.0},
                   0, 'BINARY')
 
 
@@ -29,17 +29,17 @@ def sample_BQM(BQM):
     return sampler.sample(BQM)
 
 
-def and_gate(input_x1, input_x2, sampled_and):
+def cnot_gate(input_x1, input_x2, sampled_cnot):
     '''
     O(n) - we pass through rows in simplified model and checking for matches with our two vars.
-    When found a match - we analyse the what the answer should be.
+    When found a match - we analyse what the answer should be.
 
     :param input_x1: first variable in gate
     :param input_x2: second variable in gate
     :param sampled_not: simplified model
-    :return: answer: input_x1 AND input_x2 == True or False
+    :return: answer: input_x1 CNOT input_x2 == 1 or 0
     '''
-    sliced_set = sampled_and.slice(0, 1) #first row
+    sliced_set = sampled_cnot.slice(0, 1) #first row
 
     # x1,2 from model
     comparing_x1, comparing_x2 = sliced_set.first.sample['x1'], sliced_set.first.sample['x2']
@@ -47,24 +47,22 @@ def and_gate(input_x1, input_x2, sampled_and):
     i = 1 #num of current row
     while comparing_x1 != input_x1 or comparing_x2 != input_x2: #work untill it is a match
         try:
-            sliced_set = sampled_and.slice(i, i+1)
+            sliced_set = sampled_cnot.slice(i, i+1)
             comparing_x1, comparing_x2 = sliced_set.first.sample['x1'], sliced_set.first.sample['x2']
         except (IOError, Exception) as err:
-            print("I can't apply AND gate to the x and y")
+            print("I can't apply CNOT gate to the x and y")
             break
         i += 1
 
-    #if energy is minimal and y1 from model is 1 then True
-    if sliced_set.first.sample['y1'] == 1 and \
-        sliced_set.data_vectors['energy'][0] == sampled_and.lowest().data_vectors['energy'][0]:
-        return 1
-    else:
-        return 0
+    #if it's a match and y from model is 1 then x3
+    if sliced_set.first.sample['y'] == 1:
+        return sliced_set.first.sample['x3']
 
 
 if __name__ == '__main__':
-    sampled_model = sample_BQM(AND_BQM) #sampling model
+    sampled_model = sample_BQM(CNOT_BQM) #sampling model
+    print(sampled_model)
     #input
-    in_x, in_y = inp("Please, input an x and y (with a gap between) to apply AND gate: ")
+    in_x, in_y = inp("Please, input an x and y (with a gap between, x - control) to apply CNOT gate: ")
     #answer
-    print(and_gate(in_x, in_y, sampled_model))
+    print(cnot_gate(in_x, in_y, sampled_model))

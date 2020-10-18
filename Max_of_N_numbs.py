@@ -70,7 +70,7 @@ def apply_func(in_array):
 
     #samplifying model
     sampled_model = sample_BQM(Max_of_N_BQM)
-
+    print(sampled_model)
     return max_of_N_numbers(Max_of_N_dict, sampled_model, len(in_array))
 
 
@@ -91,7 +91,7 @@ def hand_test():
 
         # samplifying model
         sampled_model = sample_BQM(Max_of_N_BQM)
-
+        print(sampled_model)
         # answer
         print(*max_of_N_numbers(Max_of_N_dict, sampled_model, len(in_array)))
 

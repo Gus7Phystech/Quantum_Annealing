@@ -44,7 +44,7 @@ def not_gate(input_x, sampled_not):
 
 if __name__ == '__main__':
     sampled_model = sample_BQM(NOT_BQM) #sampling model
-    print(sampled_model)
+    #print(sampled_model)
     #input
     in_x = int(input("Please, input an x to apply NOT gate: "))
     #answer
