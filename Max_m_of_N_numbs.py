@@ -1,12 +1,9 @@
-import math
-import random
-
 import dimod
 from dimod.reference.samplers import ExactSolver
 
 
 '''
-func maxsubset(in_array, m) gets array and lenght of needed subarray with maximum sum.
+func max_subset(in_array, m) gets array and lenght of needed subarray with maximum sum.
 It returns required subarray
 
 hand_test() right after the start applies maxsubset and prints the answer unless you type 'exit' 
