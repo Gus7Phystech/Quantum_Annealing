@@ -49,7 +49,7 @@ def max_subset(in_array, m):
                                      dict_q_i_q_j,
                                      BQM_const, 'BINARY')
     sampled_BQM = sample_BQM(BQM)
-
+    print(sampled_BQM)
     #forming the answer
     ans = []  # here will be the answer
     for i in range(N):
