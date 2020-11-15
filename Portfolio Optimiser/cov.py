@@ -24,15 +24,15 @@ def covariance(n, averages_1, values_1, averages_2, values_2):
         s += (values_1[i] - averages_1[i])*(values_2[i] - averages_2[i])
     return s/n
 
-MATR_COV = [[]]
+MATR_COV = [[0 for i in range(6)] for j in range(6)]
 
 stock_names = ['GAZP.ME', 'TSLA', 'BP', 'AAPL', 'GOOG', 'SBER.ME']
 for d_1 in enumerate(stock_names):
     for d_2 in enumerate(stock_names):
 
 
-        data_1 = open_csv('Stocks/{}.csv'.format(d_1))
-        data_2 = open_csv('Stocks/{}.csv'.format(d_2))
+        data_1 = open_csv('Stocks/{}.csv'.format(d_1[1]))
+        data_2 = open_csv('Stocks/{}.csv'.format(d_2[1]))
         l = min(len(data_1), len(data_2))
 
         avg_1 = []
@@ -51,5 +51,5 @@ for d_1 in enumerate(stock_names):
 
         cov = covariance(l//30-1, avg_1, val_1, avg_2, val_2)
 
-        MATR_COV[d_1.][d_2.] = cov
+        MATR_COV[d_1[0]][d_2[0]] = cov
 

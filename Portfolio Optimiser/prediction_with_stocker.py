@@ -8,7 +8,9 @@ s = Stocker(stock_name)
 
 #stock_history = s.stock
 #print(stock_history.tail())
-s.plot_stock()
 
-prediction = stocker.predict.tomorrow('AAPL')
+prediction, a = stocker.predict.tomorrow('AAPL')
+print(prediction)
+stock_names = ['GAZP.ME', 'TSLA', 'BP', 'AAPL', 'GOOG', 'SBER.ME']
+E = [17.95, 40.85, 1.88, 11.92, 177.70, 24.11]
 
