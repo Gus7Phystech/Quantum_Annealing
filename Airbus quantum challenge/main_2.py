@@ -20,8 +20,8 @@ h_a_dict = {}
 J_a_b_dict = {}
 
 L = 1
-N = 2
-n = 2
+N = 4
+n = 5
 
 W_p = 40*10**3
 W_e = 120*10**3
@@ -41,21 +41,38 @@ theta_mass = 10
 theta_space = 10
 theta_one_to_one = 5
 theta_target_x = 0.5
+
+rew = []
+for i in range(N):
+    j = -N / 2 + 0.5 + i
+    rew.append( 70*(-1/(N/2 - 0.5)*abs(j) + 2) ) # 0 ... 1 ... 0
+
+for k in range(N):
+    j = -N/2+0.5 + k
+    for i in range(n):
+        for i_1 in range(i+1, n):
+            J_a_b_dict['Z{}_{}'.format(i, j),
+                       'Z{}_{}'.format(i_1, j)] = 2*t[i]*t[i_1]
+
 for i in range(n):
     for k in range(N):
         j = -N/2+0.5 + k
-        h_a_dict['Z{}_{}'.format(i, j)] = theta_mass*(-2*W_p*m[i] + m[i]**2)+theta_space*(- 2*N*t[i] + t[i]**2) + W_e*(x_cg_e - x_cg_max)*m[i]*(L/N*j-x_cg_min) + \
-            W_e*(x_cg_e - x_cg_min)*m[i]*(L/N*j-x_cg_max) + m[i]**2*(L/N*j - x_cg_min)*(L/N*j - x_cg_max) + \
-            theta_target_x*(2*W_e*(x_cg_e - x_cg_t)*m[i]*(L/N*j-x_cg_t) + m[i]**2*(L/N*j-x_cg_t)**2) + theta_one_to_one*(t[i] + 1)
-        for i_1 in range(n):
+        h_a_dict['Z{}_{}'.format(i, j)] = - rew[k]*m[i] + t[i]**2 - t[i]
+
+        for k_1 in range(k+1, N):
+            j_1 = -N / 2 + 0.5 + k_1
+            J_a_b_dict['Z{}_{}'.format(i, j),
+                       'Z{}_{}'.format(i, j_1)] = 2
+        '''for i_1 in range(n):
             for k_1 in range(N):
                 j_1 = -N/2+0.5 + k_1
                 J_a_b_dict['Z{}_{}'.format(i, j),
                            'Z{}_{}'.format(i_1, j_1)] = theta_mass*(2*m[i]*m[i_1]) + theta_space*(2*t[i]*t[i_1]) + 2*m[i]*m[i_1]*(L/N*j-x_cg_min)*(L/N*j_1-x_cg_max) + \
-                    theta_target_x*(2*m[i]*m[i_1]*(L/N*j-x_cg_t)*(L/N*j_1-x_cg_t))
+                    theta_target_x*(2*m[i]*m[i_1]*(L/N*j-x_cg_t)*(L/N*j_1-x_cg_t))'''
 
-gamma = theta_mass*(W_p**2)+theta_space*(N**2) + W_e**2*(x_cg_e - x_cg_min)*(x_cg_e - x_cg_max) + theta_target_x*(W_e**2*(x_cg_e - x_cg_t)**2) +theta_one_to_one*(- N - n)
 
+#gamma = theta_mass*(W_p**2)+theta_space*(N**2) + W_e**2*(x_cg_e - x_cg_min)*(x_cg_e - x_cg_max) + theta_target_x*(W_e**2*(x_cg_e - x_cg_t)**2) +theta_one_to_one*(- N - n)
+gamma = 0
 BQM = dimod.BinaryQuadraticModel(h_a_dict, J_a_b_dict, gamma, 'BINARY')
 
 sampler = ExactSolver()
@@ -65,7 +82,7 @@ sampled = sampler.sample(BQM)
 #ising_model = BQM.to_ising()
 #sampler = EmbeddingComposite(DWaveSampler())
 #sampled = sampler.sample_ising(h = ising_model[0], J = ising_model[1], num_reads = 100)
-print(sampled)
+print(sampled.slice(0, 10))
 
 loaded_mass = []
 loaded_coord = []
