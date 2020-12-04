@@ -2,6 +2,7 @@ import dimod
 #from dwave.system import EmbeddingComposite, DWaveSampler
 from dimod import BinaryQuadraticModel, ExactSolver
 from sklearn import preprocessing
+import numpy as np
 #import xlrd
 
 #book = xlrd.open_workbook('containers.xlsx')
@@ -16,12 +17,14 @@ m = [2134.0, 3455.0, 1866.0, 1699.0, 3500.0, 3332.0, 2578.0, 2315.0, 1888.0, 178
 #    t.append(sheet.cell(i + 1, 4).value)
 #    m.append(sheet.cell(i + 1, 5).value)
 
+# TODO Test on big dimensions
+
 h_a_dict = {}
 J_a_b_dict = {}
 
 L = 1
 N = 4
-n = 5
+n = 4
 
 W_p = 40*10**3
 W_e = 120*10**3
@@ -42,10 +45,13 @@ theta_space = 10
 theta_one_to_one = 5
 theta_target_x = 0.5
 
+aprox_mass = np.median(m[:n])*N #TODO Respecting max mass can be different
 rew = []
+target_x = ((3*x_cg_t + (x_cg_min+x_cg_max)/2)/4) / L * N
+shift_x = (target_x*(W_e + aprox_mass) - x_cg_e*W_e)/aprox_mass
 for i in range(N):
     j = -N / 2 + 0.5 + i
-    rew.append( 70*(-1/(N/2 - 0.5)*abs(j) + 2) ) # 0 ... 1 ... 0
+    rew.append( 10*(-1/(N/2 - 0.5)*abs(j - shift_x) + 10) ) # TODO Compare reward and plus for extra via coef b
 
 for k in range(N):
     j = -N/2+0.5 + k
@@ -57,7 +63,7 @@ for k in range(N):
 for i in range(n):
     for k in range(N):
         j = -N/2+0.5 + k
-        h_a_dict['Z{}_{}'.format(i, j)] = - rew[k]*m[i] + t[i]**2 - t[i]
+        h_a_dict['Z{}_{}'.format(i, j)] = - rew[k]*m[i] + t[i]**2 - t[i] #TODO Respect max mass W_p
 
         for k_1 in range(k+1, N):
             j_1 = -N / 2 + 0.5 + k_1
@@ -87,7 +93,7 @@ print(sampled.slice(0, 10))
 loaded_mass = []
 loaded_coord = []
 print()
-for a in range(5):
+for a in range(4):
     print("{} energy".format(a))
     for k in range(N):
         j = -N / 2 + 0.5 + k
@@ -100,6 +106,9 @@ for a in range(5):
                 flag = True
         if not flag:
             print(j)
+
     x = (W_e*x_cg_e + sum([a*b for a,b in zip(loaded_mass, loaded_coord)]))/(W_e + sum(loaded_mass))
     print(x)
+    loaded_mass = []
+    loaded_coord = []
     print()
