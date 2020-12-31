@@ -8,8 +8,10 @@ import numpy as np
 #book = xlrd.open_workbook('containers.xlsx')
 #sheet = book.sheet_by_index(0)
 
-t = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-m = [2134.0, 3455.0, 1866.0, 1699.0, 3500.0, 3332.0, 2578.0, 2315.0, 1888.0, 1786.0, 3277.0, 2987.0, 2534.0, 2111.0, 2607.0, 1566.0, 1765.0, 1946.0, 1732.0, 1641.0, 1800.0, 986.0, 873.0, 1764.0, 1239.0, 1487.0, 769.0, 836.0, 659.0, 765.0]
+t = [0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+m = [769.0, 836.0, 2134.0, 3455.0, 1866.0, 1699.0, 3500.0, 3332.0, 2578.0, 2315.0, 1888.0, 1786.0, 3277.0, 2987.0, 2534.0, 2111.0, 2607.0, 1566.0, 1765.0, 1946.0, 1732.0, 1641.0, 1800.0, 986.0, 873.0, 1764.0, 1239.0, 1487.0, 659.0, 765.0]
+
+non_norm_m = m
 #for i in range(15):
 #    t.append(sheet.cell(i+1, 1).value)
 #    m.append(sheet.cell(i+1, 2).value)
@@ -24,10 +26,12 @@ J_a_b_dict = {}
 
 L = 1
 N = 4
-n = 4
+n = 5
 
-W_p = 40*10**3
+W_p = 10*10**3
 W_e = 120*10**3
+non_norm_W_p = W_p
+non_norm_W_e = W_e
 m.append(W_p)
 m.append(W_e)
 m = preprocessing.normalize([m])[0]
@@ -100,15 +104,17 @@ for a in range(4):
         flag = False
         for i in range(n):
             if sampled.slice(a, a+1).first.sample['Z{}_{}'.format(i, j)] == 1:
-                print(j, m[i], t[i])
-                loaded_mass.append(m[i])
+                print(j, non_norm_m[i], t[i])
+                loaded_mass.append(non_norm_m[i])
                 loaded_coord.append(L/N*j)
                 flag = True
         if not flag:
             print(j)
 
-    x = (W_e*x_cg_e + sum([a*b for a,b in zip(loaded_mass, loaded_coord)]))/(W_e + sum(loaded_mass))
-    print(x)
+    x = (non_norm_W_e*x_cg_e + sum([a*b for a,b in zip(loaded_mass, loaded_coord)]))/(non_norm_W_e + sum(loaded_mass))
+    print('Коорд. x ц.т.', round(x, 4))
+    print('Загрузка', int(sum(loaded_mass)), 'из', non_norm_W_p)
+    print('Условие кр. сд. вып.')
     loaded_mass = []
     loaded_coord = []
     print()
